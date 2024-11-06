@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="logincss.css">
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+        // Login function
+        window.login = async function login() {
+            try {
+                // Sign out any existing user
+                await signOut(auth);
+
+                const email = document.getElementById('signin-email').value;
+                const password = document.getElementById('signin-password').value;
+
+                // Sign in with new credentials
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                alert("Login successful!");
+                window.location.href = "home.html";
+            } catch (error) {
+                console.error("Error logging in: ", error);
+                alert("Login failed: " + error.message);
+            }
+        };
+
+        // Reset Password function
+        window.resetPassword = async function resetPassword() {
+            const email = document.getElementById('signin-email').value;
+            
+            if (!email) {
+                alert("Please enter your email to reset your password.");
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Password reset email sent! Check your inbox.");
+            } catch (error) {
+                console.error("Error sending reset email: ", error);
+                alert("Failed to send password reset email: " + error.message);
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-wrapper">
+            <form class="form-container" onsubmit="event.preventDefault(); login();">
+                <h2>Log In</h2>
+                <input type="text" id="signin-email" placeholder="Email" required>
+                <input type="password" id="signin-password" placeholder="Password" required>
+                <button type="submit">Log In</button>
+                <div class="toggle-form">
+                    <p><a href="#" onclick="resetPassword()">Forgot Password?</a></p>
+                    <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

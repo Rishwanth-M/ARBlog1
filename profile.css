@@ -1,0 +1,718 @@
+/* General Styles */
+
+.caption-container {
+    background-color: #f9f9f9; /* Light background for a refined look */
+    padding: 15px; /* Adds internal spacing */
+    margin: 20px 0; /* Space above and below */
+    border-radius: 8px; /* Slightly rounded corners */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for a classy feel */
+}
+
+.caption p {
+    color: #333; /* Dark text for readability */
+    font-size: 16px;
+    line-height: 1.5; /* Improves readability */
+    font-family: "Georgia", serif; /* Adds a more formal font */
+}
+
+.caption p b {
+    color: #222; /* Slightly darker for username emphasis */
+}
+
+.hashtag {
+    color: #007bff; /* Distinct color for hashtag */
+    font-weight: 500; /* Emphasize the hashtag */
+}
+
+/* Popup Overlay */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+/* Popup Content */
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    text-align: left;
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #e74c3c; /* Red shade for hover effect */
+}
+
+/* Popup Text Styling */
+.popup-content p,
+.popup-content .comments {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.popup-content .comments {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Scrollbar Styling for comments section */
+.popup-content .comments::-webkit-scrollbar {
+    width: 6px;
+}
+
+.popup-content .comments::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+}
+
+.popup-content .comments::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+.comment-input-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.comment-input {
+    flex-grow: 1;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+#sendCommentBtn {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#sendCommentBtn:hover {
+    background-color: #0056b3;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Navbar Styles */
+nav {
+    background-color: #fff;
+    padding: 10px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+nav .search-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    margin: 0 20px;
+}
+
+nav .search-bar input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 16px;
+    outline: none;
+}
+
+nav .search-bar i {
+    margin-left: 10px;
+    color: #aaa;
+}
+
+nav .create {
+    display: flex;
+    align-items: center;
+}
+
+nav .create .btn-primary {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 20px;
+    transition: background-color 0.3s ease;
+}
+
+nav .create .btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.profile-photo {
+    position: relative;
+    width: 100px; /* Adjust as needed */
+    height: 100px; /* Adjust as needed */
+    border-radius: 50%; /* Makes the container circular */
+    background-color: #e0e0e0; /* Light gray background as placeholder */
+    background-image:'./images/social logo.png';
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    
+}
+
+.profile-photo img.loaded {
+    display: block; /* Show image if loaded */
+}
+
+
+nav .profile-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+nav .profile-photo img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.profile-options {
+    position: absolute;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    right: 20px;
+    top: 90px;
+    z-index: 999;
+    transition: opacity 0.3s ease;
+    margin-right: 10px;
+}
+
+.profile-options a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.profile-options a:hover {
+    background-color: #f7f7f7;
+}
+
+.profile-options .profile {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+}
+
+.profile-options .profile .profile-photo {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+}
+
+/* Profile Header */
+.profile-header {
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.profile-banner {
+    position: relative;
+    width: 100%;
+    height: 500px; /* Adjust as needed */
+    background-color: #f0f0f0; /* Light gray background as placeholder */
+    background-image: './images/social logo.png';
+    background-size: contain; /* Ensure the image fits within the container */
+    background-position: center;
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+    background-blend-mode: multiply; /* Apply transparency */
+    opacity: 0.8; /* Adjust transparency level */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+
+
+
+
+.profile-info {
+    margin-top: 60px;
+}
+
+/* Add this to your internal or external CSS */
+.profile-bio {
+    font-family: 'Roboto Slab', serif; /* Use the Google Font */
+    font-size: 14px; /* Adjust font size if needed */
+    color: #666; /* Adjust text color if needed */
+    line-height: 1.5; /* Adjust line height for readability */
+}
+
+#profileOptions {
+    display: none; /* Initially hidden */
+    position: absolute;
+    top:100px;
+    right: 10;
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px;
+}
+
+/* Profile Link inside Dropdown */
+#profileOptions .profile {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between image and text */
+    padding: 10px 0;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+/* Profile Photo */
+#profileOptions .profile-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+#profileOptions .profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Handle Styling */
+#profileOptions .handle h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+#profileOptions .handle .text-muted {
+    margin: 0;
+    font-size: 14px;
+    color: #888;
+}
+
+/* Other Links in Profile Options */
+#profileOptions a:not(.profile) {
+    display: block;
+    padding: 10px;
+    color: #333;
+    text-decoration: none;
+    text-align: left;
+}
+
+#profileOptions a:not(.profile):hover {
+    background-color: #f0f0f0;
+}
+
+
+.profile-photo-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 10px;
+    border: 4px solid #fff;
+    background-color: #e0e0e0; /* Light gray background as placeholder */
+    background-image:'./images/social logo.png';
+    }
+
+.profile-photo-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the container */
+    border-radius: 50%;
+    
+}
+
+.profile-photo-large img.loaded {
+    display: block; /* Show image if it has been loaded */
+}
+
+.profile-info h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.profile-info p {
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.profile-info .btn-secondary {
+    padding: 8px 20px;
+    background-color: #498e93;
+    color: #fff;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.profile-info .btn-secondary:hover {
+    background-color: #95a5a6;
+}
+
+/* Profile Navigation */
+.profile-nav {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.profile-nav a {
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.profile-nav a:hover,
+.profile-nav a.active {
+    color: #3498db;
+    border-bottom: 2px solid #3498db;
+}
+
+/* Profile Sections */
+.profile-section {
+    margin-bottom: 20px;
+    background-color: #fff; /* White background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 15px; /* Reduced padding */
+    border-radius: 8px; /* Slightly smaller border radius */
+    max-width: 800px; /* Set a max-width for the section */
+    margin-left: auto;
+    margin-right: auto; /* Center align the section */
+}
+
+.profile-section h3 {
+    margin-bottom: 10px; /* Reduced bottom margin */
+    font-size: 18px; /* Slightly smaller font size */
+    color: #333; /* Darker text color for the heading */
+}
+
+.profile-section p {
+    color: #666; /* Lighter text color for paragraph */
+    font-size: 14px; /* Smaller font size */
+    line-height: 1.5; /* Consistent line height for readability */
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+}
+
+.feeds {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feed {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.feed .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.feed .user {
+    display: flex;
+    align-items: center;
+}
+
+.feed .user .info a {
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none; /* Add this line to remove the underline */
+}
+
+
+.feed .user .profile-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+.feed .user .profile-photo img {
+    width: 100%;
+    height: auto;
+}
+
+
+
+.feed .photo img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.interaction-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.interaction-buttons i {
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.interaction-buttons i:hover {
+    color: #3498db;
+}
+
+.caption {
+    font-size: 14px;
+    color: #333;
+}
+
+.comments {
+    font-size: 13px;
+    color: #aaa;
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+    .profile-info h2 {
+        font-size: 20px;
+    }
+
+    .profile-info .btn-secondary {
+        padding: 6px 15px;
+    }
+
+    .profile-nav {
+        flex-direction: column;
+    }
+
+    .profile-nav a {
+        padding: 8px 10px;
+    }
+
+    .feed .user .profile-photo {
+        width: 35px;
+        height: 35px;
+    }
+
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    nav .search-bar {
+        display: none;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .profile-info h2 {
+        font-size: 18px;
+    }
+
+    .profile-info .btn-secondary {
+        padding: 4px 10px;
+    }
+
+    .profile-nav {
+        flex-direction: column;
+        font-size: 14px;
+    }
+
+    .feed {
+        padding: 10px;
+    }
+
+    .feed .photo img {
+        border-radius: 5px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+}
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-stats .stat {
+    text-align: center;
+}
+
+.profile-stats .stat strong {
+    display: block;
+    font-size: 20px;
+    color: #333;
+}
+
+.profile-stats .stat span {
+    font-size: 14px;
+    color: #666;
+}
+
+.stat {
+    text-align: center;
+    margin-top: 15px;
+}
+
+#followButton {
+    padding: 10px 20px;
+    background-color: #007bff; /* Bootstrap primary color */
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    max-width: 200px;
+    display: inline-block;
+}
+
+#followButton:hover {
+    background-color: #0056b3; /* Darker shade of primary color */
+    transform: scale(1.05);
+}
+
+#followButton:active {
+    background-color: #004494; /* Even darker shade of primary color */
+    transform: scale(1);
+}
+
+@media (max-width: 768px) {
+    #followButton {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    #followButton {
+        padding: 6px 12px;
+        font-size: 12px;
+        max-width: 150px;
+    }
+}
+
+

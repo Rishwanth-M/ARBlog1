@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mySocial - Responsive Social Media Website</title>
+    <!-- IconScout CDN -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.6/css/unicons.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" src="home.js" defer></script>
+</head>
+
+<body>
+   <nav>
+        <div class="container">
+            <h2 class="logo">𝘼𝙍 𝘽𝙡𝙤𝙜𝙜𝙞𝙣𝙜</h2>
+            
+            <div class="create">
+                
+                    
+                
+                <div class="profile-nav">
+                
+                    <a href="home.html">Home</a>
+                </div>
+                <a href="create.html" class="btn btn-primary">Create</a>
+                <div class="profile-photo">
+                    <img src="" alt="Profile Photo" id="profileImage">
+                </div>
+                <div id="profileOptions" class="profile-options" style="display: none;">
+                    <a class="profile">
+                        <div class="profile-photo">
+                            <img src="" alt="Profile Photo" id="profileDropdownImage">
+                        </div>
+                        <div class="handle">
+                            <h4 id="profile-name"></h4>
+                            <p id="profile-handle" class="text-muted"></p>
+                        </div>
+                    </a>
+                    <a href="profile.html" id="myProfileOption">My Profile</a>
+                    <a href="login.html" id="loginOption">Login</a>
+                    <a href="signup.html" id="signupOption">Sign Up</a>
+                    <a href="#" id="logoutOption" style="display: none;">Logout</a>
+                </div>                                  
+            </div>            
+        </div>
+    </nav>
+
+    <main>
+        <div class="container"><!------------------------------------side bar container div open-------------------------------------------->
+            <div class="left"> <!------------------------------------left side bar div open-------------------------------------------->
+                <a class="profile">
+                    <div class="profile-photo">
+                        <img src="" alt="Profile Photo" id="sidebarProfileImage">
+                    </div>
+                    <div class="handle">
+                        <h4 id="sidebarProfileName"></h4>
+                        <p class="text-muted" id="sidebarProfileHandle"></p>
+                    </div>
+                </a>
+
+                <!------------------------------------side bar div open-------------------------------------------->
+
+                <div class="sidebar"> 
+                    <a class="menu-item active">
+                        <span><i class="uil uil-home"></i></span>
+                        <h3>Home</h3>   
+                    </a>
+                    <a class="menu-item" id="exploreMenuItem">
+                        <span><i class="uil uil-compass"></i></span>
+                        <h3>Explore</h3>
+                    </a>
+                    <div id="searchModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-btn">&times;</span>
+                            <h2>Search for a User</h2>
+                            <input type="text" id="searchInput" placeholder="Enter username">
+                            <div id="suggestionsContainer"></div>
+                            <button id="searchButton">Search</button>
+                        </div>
+                    </div>
+                      
+                    <a class="menu-item" id="notifications">
+                        <span><i class="uil uil-bell"><small class="notification-count" style="display:none;">0</small></i></span>
+                        <h3>Notification</h3>
+                        <!--------------- NOTIFICATION POPUP --------------->
+                        <div class="notifications-popup">
+                            <!-- Notifications will be dynamically added here -->
+                        </div>
+                        <!--------------- END NOTIFICATION POPUP --------------->
+                    </a>
+                    
+                    
+                    <a class="menu-item" id="messages-notifications" href="msg.html" style="color: black;">
+                        <span><i class="uil uil-envelope-alt"></i></span>
+                        <h3 style="color: black;">Messages</h3>
+                    </a>
+                    
+                    <a class="menu-item">
+                        <span><i class="uil uil-bookmark"></i></span>
+                        <h3>Bookmarks</h3>
+                    </a>
+                    <a class="menu-item">
+                        <span><i class="uil uil-chart-line"></i></span>
+                        <h3>Attendance</h3>
+                    </a>
+
+                    <a class="menu-item">
+                        <span><i class="uil uil-setting"></i></span>
+                        <h3>Setting</h3>
+                    </a>
+                </div> 
+                
+                    <!-----------------------------------side bar div close--------------------------------------------------->
+                
+            </div>
+
+            <!------------------------------------left side bar div close-------------------------------------------->
+           
+            <div class="middle">
+                <div class="feeds"></div>
+            </div>
+        </div>
+
+        <!------------------------------------side bar container div close-------------------------------------------->
+
+        <div id="commentsPopup" class="comments-popup hidden">
+            <div class="comments-popup-content">
+                <span class="comments-close-btn" id="closeCommentsBtn">&times;</span>
+                <h2 class="comments-header">Comments</h2>
+                <div class="comments-list" id="commentsContainer"></div>
+                <div class="comments-input-section">
+                    <input type="text" id="commentInput" class="comments-input-box" placeholder="Add a comment...">
+                    <button id="sendCommentBtn" class="comments-send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        
+    </main>
+
+    <!----------------- THEME CUSTOMIZATION -------------------->
+  
+
+    
+    
+</body>
+</html>

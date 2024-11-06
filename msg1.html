@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mySocial - Responsive Social Media Website Using HTML, CSS, & JavaScript</title>
+    <!-- IconScout CDN -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.6/css/unicons.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" src="home.js" defer></script>
+    
+</head>
+<style>
+    /* Keyframes for heart animation */
+@keyframes heartBeat {
+    0%, 100% {
+        transform: scale(1);
+        color: var(--color-black); /* Default color */
+    }
+    50% {
+        transform: scale(1.2);
+        color: var(--color-red); /* Color when animated */
+    }
+}
+
+/* Apply the animation to the liked state */
+.like-button.liked i {
+    animation: heartBeat 0.5s ease forwards;
+}
+
+/* Profile Options Container */
+/* Profile Options Dropdown */
+#profileOptions {
+    display: none; /* Initially hidden */
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 10;
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px;
+}
+
+/* Profile Link inside Dropdown */
+#profileOptions .profile {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between image and text */
+    padding: 10px 0;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+/* Profile Photo */
+#profileOptions .profile-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+#profileOptions .profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Handle Styling */
+#profileOptions .handle h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+#profileOptions .handle .text-muted {
+    margin: 0;
+    font-size: 14px;
+    color: #888;
+}
+
+/* Other Links in Profile Options */
+#profileOptions a:not(.profile) {
+    display: block;
+    padding: 10px;
+    color: #333;
+    text-decoration: none;
+    text-align: left;
+}
+
+#profileOptions a:not(.profile):hover {
+    background-color: #f0f0f0;
+}
+
+.selected-user-container {
+    margin-bottom: 10px; /* Adjust the value as needed for spacing */
+    display: flex; /* To align items horizontally */
+    align-items: center; /* Center align items vertically */
+    border: 1px solid #ccc; /* Optional: Add a border for visibility */
+    padding: 10px; /* Optional: Add padding for better spacing within the container */
+    border-radius: 5px; /* Optional: Rounded corners */
+}
+
+
+        /* Other styles */
+        .suggestion-item {
+            padding: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            margin: 2px 0;
+        }
+
+        .selected-user-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            cursor: pointer; /* Cursor to indicate it's clickable */
+        }
+
+        .profile-photo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Circular profile pictures */
+            margin-right: 10px;
+        }
+
+        .message-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-interface {
+    border: 1px solid #000000;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    background-color: #fff;
+    margin-bottom: 10px;
+}
+
+/* Styles for the message container */
+#messages-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 400px; /* Set a max height for the chat box */
+    overflow-y: auto; /* Enable scrolling for overflow */
+    padding: 10px;
+    border: 1px solid #ccc; /* Add a border for better visibility */
+    background-color: #f9f9f9; /* Light background color */
+    border-radius: 5px; /* Slightly rounded corners */
+}
+
+/* Styles for sent messages */
+.sent-message {
+    align-self: flex-end; /* Align sent messages to the right */
+    background-color: #0084ff; /* Blue background for sent messages */
+    color: white; /* White text color */
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 15px 15px 0 15px; /* Rounded corners on the left */
+    max-width: 80%; /* Limit width */
+    word-wrap: break-word; /* Allow text to wrap */
+}
+
+.received-message {
+    align-self: flex-start ; /* Align received messages to the left */
+    background-color: #e5e5ea ; /* Light gray background for received messages */
+    color: black ; /* Black text color */
+    padding: 10px ;
+    margin: 5px 0 ;
+    border-radius: 15px 15px 15px 0 ; /* Rounded corners on the right */
+    max-width: 80% ; /* Limit width */
+    word-wrap: break-word ; /* Allow text to wrap */
+}
+
+/* Style for the message input field */
+#message-input {
+    flex: 1;                   /* Allow input to grow and take available space */
+    padding: 10px;            /* Add padding for better usability */
+    border: 1px solid #ccc;   /* Light gray border */
+    border-radius: 4px;       /* Rounded corners */
+    font-size: 16px;          /* Increase font size */
+    transition: border-color 0.3s; /* Smooth border color transition */
+    width: auto;
+}
+
+/* Change border color on focus */
+#message-input:focus {
+    border-color: #007BFF;    /* Change border color to blue on focus */
+    outline: none;             /* Remove default outline */
+}
+
+/* Style for the send button */
+#send-message {
+    background-color: #007BFF; /* Bootstrap primary color */
+    color: white;              /* White text color */
+    border: none;              /* No border */
+    border-radius: 4px;       /* Rounded corners */
+    padding: 10px 15px;       /* Padding for button */
+    font-size: 16px;          /* Match font size with input */
+    margin-left: 10px;        /* Space between input and button */
+    cursor: pointer;           /* Change cursor to pointer on hover */
+    transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+/* Change button background color on hover */
+#send-message:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+#close-chat:hover {
+        background-color: #ff1a1a; /* Darker shade on hover */
+    }
+
+</style>
+<body>
+    <nav>
+        <div class="container">
+            <h2 class="logo">𝘼𝙍 𝘽𝙡𝙤𝙜𝙜𝙞𝙣𝙜</h2>
+            
+            <div class="create">
+                <div class="search-bar">
+                    
+                </div>
+                <div class="profile-nav">
+                
+                    <a href="home.html">Home</a>
+                </div>
+                <a href="create.html" class="btn btn-primary">Create</a>
+                <div class="profile-photo">
+                    <img src="" alt="Profile Photo" id="profileImage">
+                </div>
+                <div id="profileOptions" class="profile-options" style="display: none;">
+                    <a class="profile">
+                        <div class="profile-photo">
+                            <img src="" alt="Profile Photo" id="profileDropdownImage">
+                        </div>
+                        <div class="handle">
+                            <h4 id="profile-name"></h4>
+                            <p id="profile-handle" class="text-muted"></p>
+                        </div>
+                    </a>
+                    <a href="profile.html" id="myProfileOption">My Profile</a>
+                    <a href="login.html" id="loginOption">Login</a>
+                    <a href="signup.html" id="signupOption">Sign Up</a>
+                    <a href="#" id="logoutOption" style="display: none;">Logout</a>
+                </div>                                  
+            </div>            
+        </div>
+    </nav>
+
+    <script>
+        document.getElementById("profileImage").addEventListener("click", function() {
+            var options = document.getElementById("profileOptions");
+            if (options.style.display === "none" || options.style.display === "") {
+                options.style.display = "block";
+            } else {
+                options.style.display = "none";
+            }
+        });
+        
+        document.addEventListener("click", function(event) {
+            var options = document.getElementById("profileOptions");
+            var profileImage = document.getElementById("profileImage");
+            if (event.target !== options && event.target !== profileImage) {
+                options.style.display = "none";
+            }
+        });
+        
+
+    </script>
+
+    <!-------------------------------- MAIN ----------------------------------->
+    
+
+            <!----------------- MIDDLE -------------------->
+            <div class="middle">
+                <div class="feeds">
+                    <div class="feed">
+                        <div class="head">
+                            <div class="user">
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!----------------- END OF FEEDS -------------------->
+
+                
+                
+                
+            </div>
+             <!----------------- END OF MIDDLE -------------------->
+
+            <!----------------- RIGHT -------------------->
+            <div class="right">
+                <!------- MESSAGES ------->
+                <div class="messages">
+                    <div class="heading">
+                        <h4>Messages</h4>
+                        <i class="uil uil-edit"></i>
+                    </div>
+                    <div class="search-bar">
+                        <i class="uil uil-search"></i>
+                        <input type="search" placeholder="Search messages" id="message-search">
+                        <div id="suggestionsContainer1" class="suggestions-container"></div>
+                    </div>
+                    
+                
+                    <!------- MESSAGES CATEGORY ------->
+                    <div class="category">
+                        <h6 class="active">Chats</h6>
+                    </div>
+                    <!------- MESSAGES 
+                    <div class="message">
+                        <div class="profile-photo">
+                            <img id="profile-img" src="./images/social logo.png" alt="Profile Picture">
+                        </div>
+                        <div class="message-body">
+                            <h5 id="username">Loading...</h5>
+                        </div>
+                    </div> ------->
+                    <div id="selected-user" style="display: none;">
+                        <div class="profile-photo">
+                            <img id="selected-user-img" src="./images/social logo.png" alt="Profile Picture">
+                        </div>
+                        <div class="message-body">
+                            <h5 id="selected-user-name">Username</h5>
+                        </div>
+                    </div>
+                    
+                    <div id="selected-users"><br></div> <!-- Selected users will appear here -->
+                    
+                    <div id="chat-interface" style="display:none;">
+                        <div id="chat-header">
+                            <button id="close-chat" style="float: right; background-color: #ff4d4d; color: white; border: none; border-radius: 5px; font-size: 16px; padding: 4px 4px; cursor: pointer;">X</button>
+                            <h2 id="chat-username"></h2>
+                
+                        </div>
+                        <div id="messages-container"></div>
+                        <input type="text" id="message-input" placeholder="Type your message...">
+                        <button id="send-message">Send</button>
+                    </div>
+     
+                </div>
+
+                <script type="module">
+                    import { db } from "./firebase-config.js";
+                    import { collection, doc, getDoc, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+                    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+                
+                    const auth = getAuth();
+                
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const searchInput = document.getElementById('message-search');
+                        const suggestionsContainer = document.getElementById('suggestionsContainer1');
+                        const selectedUsersContainer = document.getElementById('selected-users');
+                        const chatUsername = document.getElementById('chat-username');
+                        const displayedUsersSet = new Set(); // To track displayed users
+                
+                        onAuthStateChanged(auth, async (user) => {
+                            if (user) {
+                                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                                const currentUsername = userDoc.exists() ? userDoc.data().username : null;
+                                
+                                if (currentUsername) {
+                                    // User is signed in; load selected users
+                                    await loadSelectedUsers(currentUsername); // Pass the username to the function
+                                }
+                            } else {
+                                console.log("User is not logged in.");
+                            }
+                        });
+                
+                        searchInput.addEventListener('input', async function() {
+                            const queryText = this.value.trim();
+                
+                            if (queryText.length > 0) {
+                                try {
+                                    const usersRef = collection(db, 'users');
+                                    const q = query(usersRef, where('username', '>=', queryText), where('username', '<=', queryText + '\uf8ff'));
+                                    const querySnapshot = await getDocs(q);
+                
+                                    suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+                                    suggestionsContainer.style.display = 'block'; // Show suggestions container
+                
+                                    if (!querySnapshot.empty) {
+                                        querySnapshot.forEach(doc => {
+                                            const username = doc.data().username;
+                                            const suggestionItem = document.createElement('div');
+                                            suggestionItem.className = 'suggestion-item';
+                                            suggestionItem.textContent = username;
+                
+                                            suggestionItem.addEventListener('click', async () => {
+                                                await showSelectedUser(username);
+                                                suggestionsContainer.style.display = 'none'; // Hide suggestions container
+                                                searchInput.value = ''; // Clear the search input after selection
+                                            });
+                
+                                            suggestionsContainer.appendChild(suggestionItem);
+                                        });
+                                    } else {
+                                        suggestionsContainer.innerHTML = '<p>No users found</p>';
+                                    }
+                                } catch (error) {
+                                    console.error('Error fetching user suggestions:', error);
+                                }
+                            } else {
+                                suggestionsContainer.innerHTML = '';
+                                suggestionsContainer.style.display = 'none'; // Hide suggestions if input is empty
+                            }
+                        });
+                
+                        async function showSelectedUser(username) {
+                            if (displayedUsersSet.has(username)) {
+                                console.log("User already displayed:", username);
+                                return; // Do not add the same user again
+                            }
+                
+                            try {
+                                const usersRef = collection(db, 'users');
+                                const userQuery = query(usersRef, where("username", "==", username));
+                                const userSnapshot = await getDocs(userQuery);
+                
+                                if (!userSnapshot.empty) {
+                                    const userData = userSnapshot.docs[0].data();
+                
+                                    // Create a new container for the selected user
+                                    const userContainer = document.createElement('div');
+                                    userContainer.className = 'selected-user-container'; // Add a class for styling
+                
+                                    // Create elements for user profile info
+                                    const profilePhoto = document.createElement('div');
+                                    profilePhoto.className = 'profile-photo';
+                                    const img = document.createElement('img');
+                                    img.src = userData.profilePicUrl || './images/social logo.png';
+                                    img.alt = "Profile Picture";
+                                    profilePhoto.appendChild(img);
+                
+                                    const messageBody = document.createElement('div');
+                                    messageBody.className = 'message-body';
+                                    const name = document.createElement('h5');
+                                    name.textContent = userData.username || 'Unknown User';
+                                    messageBody.appendChild(name);
+                
+                                    // Append profile photo and message body to the user container
+                                    userContainer.appendChild(profilePhoto);
+                                    userContainer.appendChild(messageBody);
+                
+                                    // Append the new user container to the selected users container
+                                    selectedUsersContainer.appendChild(userContainer);
+                
+                                    displayedUsersSet.add(username); // Add username to the displayed set to avoid duplicates
+                
+                                    // Store the selected user in Firestore
+                                    const currentUserDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                                    const currentUsername = currentUserDoc.exists() ? currentUserDoc.data().username : null;
+                                    
+                                    if (currentUsername) {
+                                        const chatId = [currentUsername, username].sort().join('_'); // Create a unique chat ID
+                                        const chatsRef = collection(db, 'chats'); // Reference to chats collection
+                
+                                        // Create a new document for the chat if it doesn't exist
+                                        await setDoc(doc(chatsRef, chatId), {
+                                            users: [currentUsername, username],
+                                            createdAt: new Date() // Timestamp for the chat creation
+                                        });
+                
+                                        // Add click event to userContainer to open chat
+                                        userContainer.addEventListener('click', () => {
+                                            openChat(chatId, username); // Open chat when user is clicked
+                                        });
+                
+                                        console.log(`Chat document created for users: ${username}`);
+                                    }
+                                } else {
+                                    console.log("No such document!");
+                                }
+                            } catch (error) {
+                                console.error("Error getting document:", error);
+                            }
+                        }
+                
+                        async function openChat(chatId, username) {
+    const chatInterface = document.getElementById('chat-interface');
+    const messagesContainer = document.getElementById('messages-container');
+    const messageInput = document.getElementById('message-input');
+    const chatUsername = document.getElementById('chat-username');
+    const closeButton = document.getElementById('close-chat'); // Reference to the close button
+
+    chatUsername.textContent = username; // Display the username in the chat header
+    messagesContainer.innerHTML = ''; // Clear previous messages
+
+    // Show chat interface
+    chatInterface.style.display = 'block';
+
+    // Load existing messages between users
+    (async () => {
+        try {
+            await loadMessages(chatId);
+        } catch (error) {
+            console.error("Failed to load messages:", error);
+        }
+    })();
+
+    // Add event listener for sending messages
+    document.getElementById('send-message').onclick = async () => {
+        const messageText = messageInput.value.trim();
+        if (messageText) {
+            await sendMessage(chatId, messageText);
+            messageInput.value = ''; // Clear input
+        }
+    };
+
+    // Add click event to close the chat interface
+    closeButton.onclick = () => {
+        chatInterface.style.display = 'none'; // Hide chat interface
+    };
+}
+
+
+async function loadMessages(chatId) {
+    const messagesRef = collection(db, 'chats', chatId, 'messages'); // Reference to chat messages
+
+    try {
+        const querySnapshot = await getDocs(messagesRef);
+        const currentUsername = await getCurrentUsername(); // Retrieve current username outside of the loop
+
+        querySnapshot.forEach(doc => {
+            const messageData = doc.data();
+            displayMessage(messageData.text, messageData.sender === currentUsername); // Compare sender with currentUsername
+        });
+    } catch (error) {
+        console.error("Error loading messages:", error);
+    }
+}
+
+
+async function getCurrentUsername() {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        console.error("No user is logged in.");
+        return null;
+    }
+
+    try {
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            return userData.username; // Return the current user's username
+        } else {
+            console.error("User document does not exist in Firestore.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+        return null;
+    }
+}
+
+function displayMessage(messageText, isSent) {
+    const messagesContainer = document.getElementById('messages-container');
+    const messageElement = document.createElement('div');
+
+    // Apply classes based on who sent the message
+    messageElement.className = isSent ? 'sent-message' : 'received-message';
+    messageElement.textContent = messageText;
+
+    messagesContainer.appendChild(messageElement);
+
+    // Automatically scroll to the bottom of the messages container
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+async function sendMessage(chatId, messageText) {
+    const messagesRef = collection(db, 'chats', chatId, 'messages'); // Reference to chat messages
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        console.error("No user is logged in.");
+        return;
+    }
+
+    const senderUsername = await getSenderUsername(currentUser.uid);
+
+    if (!senderUsername) {
+        console.error("User's username is not set.");
+        return;
+    }
+
+    try {
+        await setDoc(doc(messagesRef, Date.now().toString()), {
+            text: messageText,
+            sender: senderUsername, // Store the sender's username
+            createdAt: new Date() // Timestamp for the message
+        });
+
+        displayMessage(messageText, true); // Display sent message on the right
+    } catch (error) {
+        console.error("Error sending message:", error);
+    }
+}
+
+async function getSenderUsername(userId) {
+    try {
+        const userDocRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            return userData.username; // Assuming 'username' field exists in the user document
+        } else {
+            console.error("User document does not exist in Firestore.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching sender's username:", error);
+        return null;
+    }
+}
+
+async function loadSelectedUsers(currentUsername) {
+    const chatsRef = collection(db, 'chats'); // Reference to chats collection
+    const q = query(chatsRef, where('users', 'array-contains', currentUsername)); // Get chats involving the current user
+
+    try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(doc => {
+            const chatData = doc.data();
+            const otherUsername = chatData.users.find(username => username !== currentUsername);
+            if (otherUsername) {
+                showSelectedUser(otherUsername); // Pass the other user's username to showSelectedUser
+            }
+        });
+    } catch (error) {
+        console.error("Error loading selected users:", error);
+    }
+}
+
+                    });
+
+// ------------------------------------------------ Profile dropdown Start ------------------------------------------------------ //
+
+// Profile dropdown toggle
+document.getElementById("profileImage").addEventListener("click", function() {
+    const options = document.getElementById("profileOptions");
+    options.style.display = (options.style.display === "none" || options.style.display === "") ? "block" : "none";
+});
+
+document.addEventListener("click", function(event) {
+    const options = document.getElementById("profileOptions");
+    const profileImage = document.getElementById("profileImage");
+    if (event.target !== options && event.target !== profileImage && !options.contains(event.target)) {
+        options.style.display = "none";
+    }
+});
+
+onAuthStateChanged(auth, async (user) => { 
+    if (user) {
+        // Fetch user data from Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const profilePicUrl = userData.profilePicUrl || './images/profile-1.jpg'; // Ensure this path is valid
+
+            // Update profile information in the navbar
+            document.getElementById('profile-name').textContent = userData.fullname;
+            document.getElementById('profile-handle').textContent = `@${userData.username}`;
+            document.getElementById('profileImage').src = profilePicUrl;
+            document.getElementById('profileDropdownImage').src = profilePicUrl;
+
+        } else {
+            console.error("No such user document!");
+        }
+    } else {
+        document.getElementById('profileOptions').style.display = 'none';
+    }
+});
+
+// Function to update profile options based on login status
+function updateProfileOptions() {
+    const user = auth.currentUser; // Get the current logged-in user
+    const myProfileOption = document.getElementById('myProfileOption');
+    const loginOption = document.getElementById('loginOption');
+    const signupOption = document.getElementById('signupOption');
+    const logoutOption = document.getElementById('logoutOption');
+
+    if (user) {
+        // User is logged in
+        myProfileOption.style.display = 'block';
+        loginOption.style.display = 'none';
+        signupOption.style.display = 'none';
+        logoutOption.style.display = 'block';
+    } else {
+        // User is not logged in
+        myProfileOption.style.display = 'none';
+        loginOption.style.display = 'block';
+        signupOption.style.display = 'block';
+        logoutOption.style.display = 'none';
+    }
+}
+
+// Function to handle logout
+async function handleLogout() {
+    try {
+        await auth.signOut(); // Sign out the user
+        alert('You have successfully logged out.'); // Provide feedback
+        window.location.href = 'signup.html'; 
+    } catch (error) {
+        alert('Error signing out. Please try again.'); // Notify user on error
+        console.error('Error signing out:', error);
+    }
+}
+
+// Attach event listener to logout option
+const logoutOption = document.getElementById('logoutOption');
+if (logoutOption) {
+    logoutOption.addEventListener('click', handleLogout);
+}
+
+// Update profile options on page load and auth state change
+auth.onAuthStateChanged(updateProfileOptions);
+updateProfileOptions(); // Ensure it's also run on page load
+
+// ------------------------------------------------ Profile dropdown end ------------------------------------------------------ //
+
+
+
+                </script>
+                
+            
+
+                <!------- END OF MESSAGES ------->
+
+                
+            </div>
+            <!----------------- END OF RIGHT -------------------->
+        </div>
+    </main>
+</body>
+</html>

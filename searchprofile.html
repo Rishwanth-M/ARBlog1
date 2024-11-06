@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mySocial - User Profile</title>
+    <!-- IconScout CDN -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.6/css/unicons.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap">
+    <link rel="stylesheet" href="./profile.css">
+</head>
+<body>
+    <div class="parallax-bg">
+        <div class="layer layer-1"></div>
+        <div class="layer layer-2"></div>
+        <div class="layer layer-3"></div>
+    </div>
+
+    <nav>
+        <div class="container">
+            <h2 class="logo">𝘼𝙍 𝘽𝙡𝙤𝙜𝙜𝙞𝙣𝙜</h2>
+            
+            <div class="create">
+                <div class="profile-nav">
+                    <a href="home.html">Home</a>
+                </div>
+                <a href="create.html" class="btn btn-primary">Create</a>
+                <div class="profile-photo">
+                    <img src="" alt="AR" id="profileImage">
+                </div>
+                <div id="profileOptions" class="profile-options">
+                    <a class="profile">
+                        <div class="profile-photo">
+                            <img src="" alt="" id="profileDropdownImage">
+                        </div>
+                        <div class="handle">
+                            <h4 id="profile-name"></h4>
+                            <p id="profile-handle" class="text-muted"></p>
+                        </div>
+                    </a>
+                    <a href="profile.html">View Profile</a>
+                    <a href="login.html">Login</a>
+                    <a href="logout.html">Logout</a>
+                </div>                                  
+            </div>            
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="profile-header">
+            <div class="profile-banner">
+                <img src="" alt="Profile Banner" id="profileBanner" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="loading-spinner" id="bannerLoadingSpinner"></div>
+            </div>                                    
+            <div class="profile-info">
+                <div class="profile-photo-large">
+                    <img src="" alt="Profile Photo" id="profilePhotoLarge">
+                    <div class="loading-spinner" id="profileLoadingSpinner"></div>
+                </div>
+                <h2 id="profile-name"></h2>
+                <p id="profile-handle" class="text-muted"></p>
+                <p id="profile-bio" class="profile-bio">Loading user information...</p>
+                <a href="editProfile.html" class="btn btn-secondary">Edit Profile</a>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <strong id="followersCount">0</strong>
+                        <span>Followers</span>
+                    </div>
+                    <div class="stat">
+                        <strong id="followingCount">0</strong>
+                        <span>Following</span>
+                    </div>
+                    <div class="stat">
+                        <button id="followButton" class="btn btn-primary">Follow</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-nav">
+                <a href="#posts">Posts</a>
+            </div>
+
+            <section id="about" class="profile-section">
+                <h3>About Me</h3>
+                <p id="profile-about">I love sharing my thoughts on art, technology, and lifestyle. Join me on this journey of creativity and exploration!</p>
+            </section>
+
+            <section id="posts" class="profile-section">
+                <h3>My Posts</h3>
+                <div class="feeds"></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Firebase and Custom Script -->
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+        // Profile dropdown toggle
+        document.getElementById("profileImage").addEventListener("click", function() {
+            const options = document.getElementById("profileOptions");
+            options.style.display = (options.style.display === "none" || options.style.display === "") ? "block" : "none";
+        });
+
+        document.addEventListener("click", function(event) {
+            const options = document.getElementById("profileOptions");
+            const profileImage = document.getElementById("profileImage");
+            if (event.target !== options && event.target !== profileImage) {
+                options.style.display = "none";
+            }
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Fetch user data from Firestore
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    const profilePicUrl = userData.profilePicUrl || '';
+                    
+                    document.getElementById('profile-name').textContent = userData.fullname;
+                    document.getElementById('profile-handle').textContent = `@${userData.username}`;
+                    document.getElementById('profile-bio').innerHTML = `<strong>${userData.fullname}</strong><br>${userData.bio}`;
+                    document.getElementById('profile-about').textContent = userData.about;
+                    
+                    // Update profile picture and banner with loading states
+                    if (userData.profilePicUrl) {
+                        updateProfileImage(userData.profilePicUrl);
+                    }
+                    
+                    if (userData.bannerPicUrl) {
+                        updateBanner(userData.bannerPicUrl);
+                    }
+
+                    // Load posts and gallery with profile picture URL
+                    loadPosts(user.uid, profilePicUrl);
+                    loadGallery(user.uid);
+                } else {
+                    console.error("No such user document!");
+                }
+            } else {
+                document.getElementById('profileOptions').style.display = 'none';
+            }
+        });
+
+        // Load user posts
+        function loadPosts(userId, profilePicUrl) {
+            const userPostsRef = collection(db, 'users', userId, 'posts');
+            const q = query(userPostsRef, orderBy('timestamp', 'desc'));
+
+            onSnapshot(q, (snapshot) => {
+                const feedsContainer = document.querySelector('.feeds');
+                feedsContainer.innerHTML = '';
+                snapshot.forEach(doc => {
+                    renderPost(doc, profilePicUrl);
+                });
+            });
+        }
+
+        // Real-time post rendering
+        function renderPost(doc, profilePicUrl) {
+            const feedsContainer = document.querySelector('.feeds');
+            const post = `
+                <div class="feed" data-id="${doc.id}">
+                    <div class="head">
+                        <div class="user">
+                            <div class="profile-photo">
+                                <!-- Profile Picture -->
+                                <img src="${profilePicUrl}?t=${new Date().getTime()}" alt="Profile Picture">
+                            </div>
+                            <div class="info">
+                                <h3>${doc.data().username || "User"}</h3>
+                            </div>
+                        </div>
+                        <span class="edit">
+                            <i class="uil uil-ellipsis-h"></i>
+                        </span>
+                    </div>
+                    <div class="photo">
+                        <img src="${doc.data().imageUrl}" alt="Posted Image">
+                    </div>
+                    <div class="action-buttons">
+                        <div class="interaction-buttons">
+                            <span class="like-button">
+                                <i class="uil uil-heart"></i>
+                                <span class="like-count">${doc.data().likes || 0}</span>
+                            </span>
+                            <span><i class="uil uil-comment-dots"></i></span>
+                            <span><i class="uil uil-share-alt"></i></span>
+                        </div>
+                        <div class="bookmark">
+                            <span><i class="uil uil-bookmark-full"></i></span>
+                        </div>
+                    </div>
+                    <div class="caption">
+                        <p><b>${doc.data().username || "User"}</b> ${doc.data().caption} <span class="harsh-tag">#yourHashtag</span></p>
+                    </div>
+                    <div class="comments text-muted">
+                        View all comments
+                    </div>
+                    <small>${new Date(doc.data().timestamp?.seconds * 1000).toLocaleTimeString()}</small>
+                </div>
+            `;
+
+            feedsContainer.insertAdjacentHTML('afterbegin', post);
+
+            // Add event listener for the like button
+            const likeButton = feedsContainer.querySelector(`[data-id="${doc.id}"] .like-button`);
+            likeButton.addEventListener('click', () => handleLike(doc.id));
+        }
+
+        // Update banner and profile picture
+        function updateBanner(url) {
+            const banner = document.getElementById('profileBanner');
+            const spinner = document.getElementById('bannerLoadingSpinner');
+
+            spinner.style.display = 'block';
+            banner.style.display = 'none';
+
+            // Create an Image object to preload the image
+            const img = new Image();
+            img.src = `${url}?t=${new Date().getTime()}`;
+            img.onload = () => {
+                banner.src = img.src;
+                banner.style.display = 'block';
+                spinner.style.display = 'none';
+            };
+            img.onerror = () => {
+                console.error('Failed to load banner image');
+                spinner.style.display = 'none';
+            };
+        }
+
+        function updateProfileImage(url) {
+            const profileImage = document.getElementById('profilePhotoLarge');
+            const spinner = document.getElementById('profileLoadingSpinner');
+
+            spinner.style.display = 'block';
+            profileImage.style.display = 'none';
+
+            // Create an Image object to preload the image
+            const img = new Image();
+            img.src = `${url}?t=${new Date().getTime()}`;
+            img.onload = () => {
+                profileImage.src = img.src;
+                profileImage.style.display = 'block';
+                spinner.style.display = 'none';
+            };
+            img.onerror = () => {
+                console.error('Failed to load profile image');
+                spinner.style.display = 'none';
+            };
+        }
+
+        // Follow/Unfollow logic
+        const followButton = document.getElementById('followButton');
+        followButton.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (user) {
+                // Assuming 'followers' is an array in the user's document
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+                const userData = userDoc.data();
+
+                if (userData.followers && userData.followers.includes(auth.currentUser.uid)) {
+                    // Unfollow logic
+                    await updateDoc(userDocRef, {
+                        followers: userData.followers.filter(follower => follower !== auth.currentUser.uid)
+                    });
+                    followButton.textContent = 'Follow';
+                } else {
+                    // Follow logic
+                    await updateDoc(userDocRef, {
+                        followers: [...(userData.followers || []), auth.currentUser.uid]
+                    });
+                    followButton.textContent = 'Unfollow';
+                }
+            }
+        });
+
+        // Handle like button functionality
+        function handleLike(postId) {
+            const likeButton = document.querySelector(`[data-id="${postId}"] .like-button`);
+            const likeCountElement = likeButton.querySelector('.like-count');
+            let likeCount = parseInt(likeCountElement.textContent, 10);
+
+            if (likeButton.classList.contains('liked')) {
+                likeCount--;
+                likeButton.classList.remove('liked');
+            } else {
+                likeCount++;
+                likeButton.classList.add('liked');
+            }
+
+            likeCountElement.textContent = likeCount;
+
+            // Update like count in Firestore (Implement the update logic as per your data structure)
+        }
+
+    </script>
+</body>
+</html>

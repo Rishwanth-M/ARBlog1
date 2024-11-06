@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <input type="text" id="usernameInput" placeholder="Enter username">
+    <button id="searchButton">Search</button>
+
+    <!-- Include Firebase and custom scripts here -->
+    <script src="firebase-config.js"></script>
+    <script type="module">
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            async function searchUsername() {
+                const usernameInput = document.getElementById("usernameInput");
+                if (!usernameInput) {
+                    console.error("Element with ID 'usernameInput' not found.");
+                    return;
+                }
+
+                const username = usernameInput.value;
+
+                const db = getFirestore();
+                const q = query(collection(db, "users"), where("username", "==", username));
+
+                try {
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        querySnapshot.forEach((doc) => {
+                            console.log("Username found:", doc.data().username);
+                            window.location.href = `profile.html?user=${doc.id}`;
+                        });
+                    } else {
+                        console.log("Username not found");
+                    }
+                } catch (error) {
+                    console.error("Error searching username: ", error);
+                }
+            }
+
+            document.getElementById("searchButton").onclick = searchUsername;
+        });
+    </script>
+</body>
+</html>

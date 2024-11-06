@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="./editprofile.css">
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>Edit Profile</h1>
+            <form id="editProfileForm">
+                <label for="editFullname">Full Name:</label>
+                <input type="text" id="editFullname" required>
+
+                <label for="editUsername">Username:</label>
+                <input type="text" id="editUsername" required>
+                <div id="usernameError" style="color: red; display: none;">Username is already taken</div>
+
+                <label for="editBio">Bio:</label>
+                <textarea id="editBio"></textarea>
+
+                <label for="editAbout">About:</label>
+                <textarea id="editAbout"></textarea>
+
+                <label for="editProfilePic">Profile Picture:</label>
+                <input type="file" id="editProfilePic" accept="image/*">
+
+                <label for="editBannerPic">Banner Picture:</label>
+                <input type="file" id="editBannerPic" accept="image/*">
+
+                <!-- Crop Modal -->
+                <div id="cropModal" style="display: none;">
+                    <h2>Crop Your Image</h2>
+                    <div>
+                        <img id="cropImage" style="max-width: 100%;">
+                    </div>
+                    <button id="cropButton" type="button" class="btn btn-primary">Crop & Save</button>
+                    <button id="cancelCropButton" type="button" class="btn">Cancel</button>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Include Cropper.js from a CDN -->
+    <script src="https://unpkg.com/cropperjs"></script>
+
+    <!-- Firebase and Custom Script -->
+    <script type="module">
+    import { auth, db, storage } from './firebase-config.js';
+import { doc, getDoc, updateDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+
+document.addEventListener('DOMContentLoaded', () => {
+    const editProfileForm = document.getElementById('editProfileForm');
+    const fullnameInput = document.getElementById('editFullname');
+    const usernameInput = document.getElementById('editUsername');
+    const bioInput = document.getElementById('editBio');
+    const aboutInput = document.getElementById('editAbout');
+    const profilePicInput = document.getElementById('editProfilePic');
+    const bannerPicInput = document.getElementById('editBannerPic');
+    const usernameError = document.getElementById('usernameError');
+    const cropModal = document.getElementById('cropModal');
+    const cropImage = document.getElementById('cropImage');
+    const cropButton = document.getElementById('cropButton');
+    const cancelCropButton = document.getElementById('cancelCropButton');
+
+    let cropper;
+    let currentFileInput;
+    let isProfilePic;
+
+    // Reset cropper
+    const resetCropper = () => {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        cropImage.src = '';
+        currentFileInput = null;
+        isProfilePic = false;
+        cropModal.style.display = 'none';
+    };
+
+    // Show cropper with selected image
+    const showCropper = (input, isProfile) => {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                cropImage.src = reader.result;
+                cropModal.style.display = 'block';
+                cropper = new Cropper(cropImage, {
+                    aspectRatio: isProfile ? 1 : 16 / 9,
+                    viewMode: 1,
+                });
+            };
+            reader.readAsDataURL(file);
+            currentFileInput = input;
+            isProfilePic = isProfile;
+        }
+    };
+
+    profilePicInput.addEventListener('change', () => {
+        resetCropper();
+        showCropper(profilePicInput, true);
+    });
+
+    bannerPicInput.addEventListener('change', () => {
+        resetCropper();
+        showCropper(bannerPicInput, false);
+    });
+
+    cropButton.addEventListener('click', async () => {
+        if (!cropper || !currentFileInput) {
+            alert('No image to crop or file input is not available.');
+            return;
+        }
+
+        const canvas = cropper.getCroppedCanvas({
+            width: isProfilePic ? 300 : 1280,
+            height: isProfilePic ? 300 : 720,
+        });
+
+        canvas.toBlob(async (blob) => {
+            if (!blob) {
+                alert('Failed to crop the image. Please try again.');
+                return;
+            }
+
+            const file = new File([blob], currentFileInput.files[0].name, { type: 'image/jpeg' });
+            const storageRef = ref(storage, `${isProfilePic ? 'profile_pics' : 'banner_pics'}/${auth.currentUser.uid}/${file.name}`);
+
+            try {
+                await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(storageRef);
+
+                if (currentFileInput) {
+                    currentFileInput.setAttribute('data-url', downloadURL);
+                } else {
+                    console.error("Error: currentFileInput is null.");
+                }
+
+                resetCropper();
+            } catch (error) {
+                console.error("Error uploading cropped image: ", error);
+                alert('Failed to upload cropped image.');
+            }
+        });
+    });
+
+    cancelCropButton.addEventListener('click', resetCropper);
+
+    // Real-time username validation
+    usernameInput.addEventListener('input', async () => {
+        const username = usernameInput.value.trim();
+
+        if (username) {
+            try {
+                // Query Firestore to check if the username already exists
+                const usersRef = collection(db, "users");
+                const usernameQuery = query(usersRef, where("username", "==", username));
+                const querySnapshot = await getDocs(usernameQuery);
+
+                if (!querySnapshot.empty) {
+                    // Username exists, show error message
+                    usernameError.style.display = 'block';
+                    usernameError.textContent = 'Username is already taken';
+                } else {
+                    // Username is available, hide error message
+                    usernameError.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Error checking username: ", error);
+            }
+        } else {
+            usernameError.style.display = 'none'; // Clear error if input is empty
+        }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                fullnameInput.value = userData.fullname || '';
+                usernameInput.value = userData.username || '';
+                bioInput.value = userData.bio || '';
+                aboutInput.value = userData.about || '';
+                const isProfileComplete = userData.isProfileComplete;
+
+                if (userData.profilePicUrl) {
+                    profilePicInput.setAttribute('data-url', userData.profilePicUrl);
+                }
+                if (userData.bannerPicUrl) {
+                    bannerPicInput.setAttribute('data-url', userData.bannerPicUrl);
+                }
+
+                // Handle form submission
+                editProfileForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const updatedData = {
+                        fullname: fullnameInput.value,
+                        username: usernameInput.value,
+                        bio: bioInput.value,
+                        about: aboutInput.value,
+                        profilePicUrl: profilePicInput.getAttribute('data-url'),
+                        bannerPicUrl: bannerPicInput.getAttribute('data-url'),
+                        isProfileComplete: true // Mark profile as complete
+                    };
+
+                    try {
+                        await updateDoc(userDocRef, updatedData);
+                        alert('Profile updated successfully!');
+
+                        // Redirect based on isProfileComplete status
+                        if (!isProfileComplete) {
+                            window.location.href = 'home.html'; // First-time user goes to home page
+                        } else {
+                            window.location.href = 'profile.html'; // Returning user goes to profile page
+                        }
+                    } catch (error) {
+                        console.error("Error updating profile: ", error);
+                        alert('Failed to update profile. Please try again.');
+                    }
+                });
+            } else {
+                console.error("User document does not exist!");
+            }
+        } else {
+            window.location.href = 'login.html'; // Redirect to login if not authenticated
+        }
+    });
+});
+
+    
+</script>
+
+    
+</body>
+</html>

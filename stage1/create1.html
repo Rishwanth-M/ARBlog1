@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f06, #ff9a9e);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling of the body */
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh; /* Limit the maximum height of the container */
+            overflow-y: auto; /* Add vertical scroll if content exceeds the container height */
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-label {
+            display: block;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            text-align: center;
+            width: 100%;
+            max-width: 300px; /* Match the image preview max width */
+            margin: 0 auto;
+        }
+
+        .file-label:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        input[type="file"] {
+            display: none; /* Hide the actual file input */
+        }
+
+        #imagePreview {
+            display: none; /* Initially hide the image preview */
+            margin: 20px auto;
+            max-width: 100%;
+            max-height: 400px; /* Increased height for better visibility */
+            height: auto;
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        #imagePreview:hover {
+            transform: scale(1.05);
+        }
+
+        .filter-buttons {
+            display: none; /* Initially hide the filter buttons */
+            margin-top: 20px;
+        }
+
+        .filter-buttons button {
+            margin: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .filter-buttons button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .filter-buttons button:focus {
+            outline: none;
+        }
+
+        textarea {
+            width: 90%;
+            height: 120px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            resize: vertical;
+            font-size: 16px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button#postButton {
+            background: linear-gradient(135deg, #007bff, #00d4ff);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button#postButton:hover {
+            background: linear-gradient(135deg, #0056b3, #00aaff);
+            transform: scale(1.05);
+        }
+
+        button#postButton:focus {
+            outline: none;
+        }
+
+        button#clearButton {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button#clearButton:hover {
+            background: #e0e0e0;
+            transform: scale(1.05);
+        }
+
+        button#clearButton:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Your Blog</h1>
+
+        <!-- File Input with Styled Label -->
+        <label for="imageUpload" class="file-label">Select Image</label>
+        <input type="file" id="imageUpload" accept="image/*">
+        <br><br>
+
+        <!-- Image Preview -->
+        <img id="imagePreview" src="" alt="Image Preview">
+        <br><br>
+
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+            <button data-filter="none">None</button>
+            <button data-filter="grayscale">Grayscale</button>
+            <button data-filter="sepia">Sepia</button>
+            <button data-filter="invert">Invert</button>
+            <button data-filter="blur">Blur</button>
+        </div>
+
+        <!-- Caption Input -->
+        <textarea id="caption" placeholder="Write your caption here..."></textarea>
+        <br><br>
+
+        <!-- Submit Button -->
+        <button id="postButton">Post</button>
+        <!-- Clear Button -->
+        <button id="clearButton">Clear</button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    
+        // Firebase 
+        const firebaseConfig = {
+    apiKey: "AIzaSyDYvFdWoLL-YAObctYXBfkqwkUbLBXTsTk",
+    authDomain: "arblog-a19f3.firebaseapp.com",
+    projectId: "arblog-a19f3",
+    storageBucket: "arblog-a19f3.appspot.com",
+    messagingSenderId: "1001446483266",
+    appId: "1:1001446483266:web:436692dd843096e5eed4db",
+    measurementId: "G-4C40XF2L3W"
+  };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const storage = getStorage(app);
+        const db = getFirestore(app);
+        const auth = getAuth(app); // Initialize Firebase Authentication
+    
+        // Image preview and filter application
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const filterButtons = document.querySelector('.filter-buttons');
+        const canvas = document.createElement('canvas');
+        const canvasContext = canvas.getContext('2d');
+        let currentFilter = 'none';
+    
+        imageUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.onload = function() {
+                        filterButtons.style.display = 'block'; // Show filter buttons
+                    };
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    
+        filterButtons.addEventListener('click', function(event) {
+            if (event.target.tagName === 'BUTTON') {
+                currentFilter = event.target.getAttribute('data-filter');
+                applyFilter(currentFilter);
+            }
+        });
+    
+        function applyFilter(filter) {
+            imagePreview.style.filter = getFilterValue(filter);
+        }
+    
+        function getFilterValue(filter) {
+            switch (filter) {
+                case 'grayscale':
+                    return 'grayscale(100%)';
+                case 'sepia':
+                    return 'sepia(100%)';
+                case 'invert':
+                    return 'invert(100%)';
+                case 'blur':
+                    return 'blur(5px)';
+                default:
+                    return 'none';
+            }
+        }
+    
+        async function uploadFilteredImage() {
+            const file = imageUpload.files[0];
+            const caption = document.getElementById('caption').value;
+    
+            if (file) {
+                try {
+                    // Get the current user
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('User is not logged in.');
+                        return;
+                    }
+    
+                    // Set up canvas for filtering
+                    canvas.width = imagePreview.naturalWidth;
+                    canvas.height = imagePreview.naturalHeight;
+                    canvasContext.drawImage(imagePreview, 0, 0);
+    
+                    // Apply the filter to the canvas
+                    canvasContext.filter = getFilterValue(currentFilter);
+                    canvasContext.drawImage(imagePreview, 0, 0);
+    
+                    // Convert canvas to blob and then to File
+                    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg'));
+                    const filteredFile = new File([blob], file.name, { type: 'image/jpeg' });
+    
+                    // Upload the filtered image to Firebase Storage
+                    const storageRef = ref(storage, 'images/' + filteredFile.name);
+                    await uploadBytes(storageRef, filteredFile);
+                    
+                    // Get the download URL of the uploaded image
+                    const url = await getDownloadURL(storageRef);
+                    
+                    // Add the post to the specific user's subcollection
+                    await addDoc(collection(db, 'users', user.uid, 'posts'), {
+                        imageUrl: url,
+                        caption: caption || '',  // Allow empty captions
+                        timestamp: serverTimestamp()
+                    });
+                    alert('Post created successfully!');
+                } catch (error) {
+                    console.error('Error uploading image or saving post: ', error);
+                }
+            } else {
+                alert('Please upload an image.');
+            }
+        }
+    
+        const postButton = document.getElementById('postButton');
+        postButton.addEventListener('click', uploadFilteredImage);
+    
+        const clearButton = document.getElementById('clearButton');
+        clearButton.addEventListener('click', function() {
+            imageUpload.value = '';
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+            filterButtons.style.display = 'none';
+            imagePreview.style.filter = 'none';
+            currentFilter = 'none';
+        });
+    
+    </script>
+</body>
+</html>
